@@ -1,0 +1,104 @@
+package de.basic.example1;
+
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
+
+import de.basic.example2.JobExecuter;
+
+public class WordCountDriver extends Configured implements Tool {
+	
+	private static final Logger log = Logger.getLogger(JobExecuter.class.getName());
+	/**
+	* @param args
+	*/
+	public static void main(String[] args) throws Exception {
+		
+		int res = 1; //Wenn 1 nicht verändert wird, endet der Job nicht korrekt
+
+		try {
+			res = ToolRunner.run(new Configuration(), new WordCountDriver(), args);
+
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "Fehler beim Ausführen des MRJobs");
+			e.printStackTrace();
+		}
+		System.exit(res);
+	}
+
+	public int run(String[] args) throws Exception {
+		log.log(Level.INFO, "Starte Map-Reduce Job 'JobExecutor'....");
+		Configuration conf = this.getConf();
+		//The job submitters view of the Job.
+		//It allows the user to configure the job, submit it, control its execution, and query the state
+		Job job = null;
+		try {
+			job = Job.getInstance(conf);
+			
+		} catch(IOException e1) {
+			log.log(Level.SEVERE, "Fehler bei Instanzieerung des Jobs");
+			e1.printStackTrace();
+		}
+		//Used for debug purpose
+		job.setJobName("WordCount-Example1");
+		job.setJarByClass(WordCountDriver.class);
+		// configuration of all the file starts from here
+		job.setMapperClass(WordCountMapper.class);
+		job.setCombinerClass(WordCountReducer.class);
+		job.setReducerClass(WordCountReducer.class);
+		//Set the type of Output Key/Value
+		job.setOutputKeyClass(Text.class);
+		job.setOutputValueClass(IntWritable.class);
+		job.setMapOutputKeyClass(Text.class);
+		job.setMapOutputValueClass(IntWritable.class);
+		job.setInputFormatClass(TextInputFormat.class);
+		job.setOutputFormatClass(TextOutputFormat.class);
+
+		//Pfad, von wo aus die Eingabedaten eingelesen werden solllen, werden 
+		//beim aufruf der jar als erstes uebergeben
+		try {
+			FileInputFormat.addInputPath(job, new Path(args[0]));
+
+		} catch(IllegalArgumentException e2) {
+			log.log(Level.SEVERE, "Fehler (Argument) beim setzen des Eingabepfades");
+			e2.printStackTrace();
+		} catch(IOException e3) {
+			log.log(Level.SEVERE, "Fehler (IO) beim setzen des Eingabepfades");
+			e3.printStackTrace();
+		}
+
+		//Der Ausgabeordner wird als zweites Argument uebergeben
+		FileOutputFormat.setOutputPath(job, new Path(args[1]));
+		boolean result = false;
+
+		try {
+			//Führe den Job aus und warte, bis er beendet wurde
+			result = job.waitForCompletion(true);
+
+		} catch(ClassNotFoundException e) {
+			log.log(Level.SEVERE, "Fehler (ClassNotFound) beim Ausführen des Jobs");
+			e.printStackTrace();
+		} catch(IOException e) {
+			log.log(Level.SEVERE, "Fehler (IO) beim Ausführen des Jobs");
+			e.printStackTrace();
+		} catch(InterruptedException e) {
+			log.log(Level.SEVERE, "Fehler (Interrupted) beim Ausführen des Jobs");
+			e.printStackTrace();
+		}
+		log.log(Level.INFO, "Fertig");
+		return result ? 0: 1;
+		}
+}

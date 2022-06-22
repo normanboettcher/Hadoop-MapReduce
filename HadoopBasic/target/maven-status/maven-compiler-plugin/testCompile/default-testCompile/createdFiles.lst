@@ -1,0 +1,14 @@
+basic/example1/WordCountOnTestData.class
+basic/example2/Example2MapReduceTest.class
+basic/example3/UserIDMapReduceTest.class
+basic/example2/Example2MapperTest.class
+basic/example1/WordCountMapperTest.class
+basic/example3/UserIDMapperTest.class
+basic/example2/Example2TestBase.class
+basic/example3/UserIDReducerTest.class
+basic/example1/WordCountMapReduceTest.class
+basic/example2/Example2OnTestDataTest.class
+basic/example3/Example3TestBase.class
+basic/example1/WordCountTestBase.class
+basic/example2/Example2ReducerTest.class
+basic/example1/WordCountReducerTest.class

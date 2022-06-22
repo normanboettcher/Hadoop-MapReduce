@@ -1,0 +1,9 @@
+de/basic/example2/GradesMapper.class
+de/basic/example1/WordCountReducer.class
+de/basic/example3/UserIDReducer.class
+de/basic/example2/GradesReducer.class
+de/basic/example1/WordCountDriver.class
+de/basic/example2/JobExecuter.class
+de/basic/example1/WordCountMapper.class
+de/basic/example3/UserIDMapper.class
+de/basic/example3/BankTransactionJob.class
